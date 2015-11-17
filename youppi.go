@@ -20,7 +20,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	youppi := slackscot.NewSlackscot([]slackscot.ExtentionBundle{brain.NewKarma(), brain.NewImager()})
+	youppi := slackscot.NewSlackscot([]slackscot.ExtentionBundle{brain.NewKarma(), brain.NewImager(), brain.NewFingerQuoter()})
 
-	slackscot.Run(*youppi, *config)
+	err = slackscot.Run(*youppi, *config)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
