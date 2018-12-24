@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/alecthomas/kingpin"
 	"github.com/alexandre-normand/slackscot"
-	"github.com/alexandre-normand/slackscot/brain"
 	"github.com/alexandre-normand/slackscot/config"
+	"github.com/alexandre-normand/slackscot/plugins"
 	"log"
 )
 
@@ -20,9 +20,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	youppi := slackscot.NewSlackscot([]slackscot.ExtentionBundle{brain.NewKarma(), brain.NewImager(), brain.NewFingerQuoter(), brain.NewEmojiBannerMaker()})
+	youppi := slackscot.NewSlackscot("youppi", []slackscot.Plugin{plugins.NewKarma(), plugins.NewImager(), plugins.NewFingerQuoter(), plugins.NewEmojiBannerMaker()})
 
-	err = slackscot.Run(*youppi, *config)
+	err = youppi.Run(*config)
 	if err != nil {
 		log.Fatal(err)
 	}
