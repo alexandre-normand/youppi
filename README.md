@@ -1,7 +1,7 @@
 youppi
 ------
 
-[![CircleCI](https://circleci.com/gh/alexandre-normand/youppi.svg?style=svg)](https://circleci.com/gh/alexandre-normand/youppi)
+[![Build Status](https://travis-ci.org/alexandre-normand/youppi.svg)](https://travis-ci.org/alexandre-normand/youppi) 
 
 slack bot, written in `Go` based on [slackscot](https://github.com/alexandre-normand/slackscot).
 
