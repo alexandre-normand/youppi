@@ -20,9 +20,36 @@ func main() {
 		log.Fatal(err)
 	}
 
-	youppi := slackscot.NewSlackscot("youppi", []slackscot.Plugin{plugins.NewKarma(), plugins.NewImager(), plugins.NewFingerQuoter(), plugins.NewEmojiBannerMaker()})
+	c := *config
 
-	err = youppi.Run(*config)
+	youppi, err := slackscot.NewSlackscot("youppi", c)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	karma, err := plugins.NewKarma(c)
+	if err != nil {
+		log.Fatalf("Error initializing karma plugin: %v", err)
+	}
+	defer karma.Close()
+	youppi.RegisterPlugin(&karma.Plugin)
+
+	fingerQuoter, err := plugins.NewFingerQuoter(c)
+	if err != nil {
+		log.Fatalf("Error initializing finger quoter plugin: %v", err)
+	}
+	youppi.RegisterPlugin(&fingerQuoter.Plugin)
+
+	imager := plugins.NewImager()
+	youppi.RegisterPlugin(&imager.Plugin)
+
+	emojiBanner, err := plugins.NewEmojiBannerMaker(c)
+	if err != nil {
+		log.Fatalf("Error initializing emoji banner plugin: %v", err)
+	}
+	youppi.RegisterPlugin(&emojiBanner.Plugin)
+
+	err = youppi.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
