@@ -40,7 +40,7 @@ func main() {
 	}
 	youppi.RegisterPlugin(&fingerQuoter.Plugin)
 
-	imager := plugins.NewImager()
+	imager := plugins.NewImager(c)
 	youppi.RegisterPlugin(&imager.Plugin)
 
 	emojiBanner, err := plugins.NewEmojiBannerMaker(c)
