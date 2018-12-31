@@ -14,6 +14,7 @@ var (
 )
 
 func main() {
+	kingpin.Version(VERSION)
 	kingpin.Parse()
 
 	config, err := config.LoadConfiguration(*configurationPath)
@@ -49,6 +50,9 @@ func main() {
 		log.Fatalf("Error initializing emoji banner plugin: %v", err)
 	}
 	youppi.RegisterPlugin(&emojiBanner.Plugin)
+
+	versioner := plugins.NewVersioner("youppi", VERSION)
+	youppi.RegisterPlugin(&versioner.Plugin)
 
 	err = youppi.Run()
 	if err != nil {
