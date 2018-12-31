@@ -1,3 +1,4 @@
+//go:generate giddyup
 package main
 
 import (
