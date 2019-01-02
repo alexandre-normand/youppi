@@ -51,6 +51,12 @@ func main() {
 	}
 	youppi.RegisterPlugin(&emojiBanner.Plugin)
 
+	ohMonday, err := plugins.NewOhMonday(c)
+	if err != nil {
+		log.Fatalf("Error initializing oh monday plugin: %v", err)
+	}
+	youppi.RegisterPlugin(&ohMonday.Plugin)
+
 	versioner := plugins.NewVersioner("youppi", VERSION)
 	youppi.RegisterPlugin(&versioner.Plugin)
 
