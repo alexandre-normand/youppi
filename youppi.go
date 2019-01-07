@@ -21,6 +21,11 @@ func main() {
 	kingpin.Parse()
 
 	v := config.NewViperWithDefaults()
+	// Enable getting configuration from the environment, especially useful for the slack token
+	v.AutomaticEnv()
+	// Bind the token key config to the env variable SLACK_TOKEN (case sensitive)
+	v.BindEnv(config.TokenKey, "SLACK_TOKEN")
+
 	v.SetConfigFile(*configurationPath)
 	err := v.ReadInConfig()
 	if err != nil {
