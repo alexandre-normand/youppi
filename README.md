@@ -12,6 +12,6 @@ To learn more about the real life youppi!, check out this [99% invisible episode
 Get Started 
 -----------
 
-* Install Go: `brew install go`
-* `go get github.com/alexandre-normand/youppi`
-* Hack it
+*   Install Go: `brew install go`
+*   `go get github.com/alexandre-normand/youppi`
+*   Hack it

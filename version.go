@@ -2,5 +2,6 @@
 package main
 
 const (
+	// VERSION represents youppi's current version number
 	VERSION = "1.3.0"
 )
