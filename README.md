@@ -2,6 +2,7 @@ youppi
 ------
 
 [![Build Status](https://travis-ci.org/alexandre-normand/youppi.svg)](https://travis-ci.org/alexandre-normand/youppi) 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9cad96d6581b45ccb0687fd3bb9d049a)](https://app.codacy.com/app/alexandre-normand/youppi?utm_source=github.com&utm_medium=referral&utm_content=alexandre-normand/youppi&utm_campaign=Badge_Grade_Dashboard)
 
 slack bot, written in `Go` based on [slackscot](https://github.com/alexandre-normand/slackscot).
 
