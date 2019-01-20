@@ -62,9 +62,6 @@ func main() {
 	}
 	youppi.RegisterPlugin(&fingerQuoter.Plugin)
 
-	imager := plugins.NewImager()
-	youppi.RegisterPlugin(&imager.Plugin)
-
 	emojiBannerConf, err := config.GetPluginConfig(v, plugins.EmojiBannerPluginName)
 	if err != nil {
 		log.Fatalf("Error initializing emoji banner plugin: %v", err)
