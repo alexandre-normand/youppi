@@ -5,6 +5,7 @@ import (
 	"github.com/alexandre-normand/slackscot/v2"
 	"github.com/alexandre-normand/slackscot/v2/config"
 	"github.com/alexandre-normand/slackscot/v2/plugins"
+	"github.com/alexandre-normand/slackscot/v2/store"
 	"github.com/spf13/viper"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
@@ -14,6 +15,11 @@ import (
 var (
 	configurationPath = kingpin.Flag("configuration", "The path to the configuration file.").Required().String()
 	logfile           = kingpin.Flag("log", "The path to the log file").OpenFile(os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+)
+
+const (
+	storagePathKey = "storagePath" // Root directory for the file-based leveldb storage
+	name           = "youppi"
 )
 
 func main() {
@@ -45,11 +51,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	karma, err := plugins.NewKarma(v)
-	if err != nil {
-		log.Fatalf("Error initializing karma plugin: %v", err)
+	if !v.IsSet(storagePathKey) {
+		log.Fatalf("Missing [%s] configuration key in the top value configuration", storagePathKey)
 	}
-	defer karma.Close()
+
+	storagePath := v.GetString(storagePathKey)
+	strStorer, err := store.NewLevelDB(name, storagePath)
+	if err != nil {
+		log.Fatalf("Opening [%s] db failed with path [%s]", name, storagePath)
+	}
+	defer strStorer.Close()
+
+	karma := plugins.NewKarma(strStorer)
 	youppi.RegisterPlugin(&karma.Plugin)
 
 	fingerQuoterConf, err := config.GetPluginConfig(v, plugins.FingerQuoterPluginName)

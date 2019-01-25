@@ -8,7 +8,9 @@ slack bot, written in `Go` based on [slackscot](https://github.com/alexandre-nor
 
 ![youppi](https://www.dropbox.com/s/bp202gxqq9hkeg1/youppi_ejected.gif?raw=1)
 
-To learn more about the real life youppi!, check out this [99% invisible episode](http://99percentinvisible.org/episode/la-mascotte/).
+To learn more about the real life youppi!, check out this 
+[99% invisible episode](http://99percentinvisible.org/episode/la-mascotte/) and
+this short ["documentary"](https://www.youtube.com/watch?v=8xMIsNSbRY4).
 
 Get Started 
 -----------
