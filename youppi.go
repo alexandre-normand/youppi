@@ -2,10 +2,10 @@
 package main
 
 import (
-	"github.com/alexandre-normand/slackscot/v2"
-	"github.com/alexandre-normand/slackscot/v2/config"
-	"github.com/alexandre-normand/slackscot/v2/plugins"
-	"github.com/alexandre-normand/slackscot/v2/store"
+	"github.com/alexandre-normand/slackscot"
+	"github.com/alexandre-normand/slackscot/config"
+	"github.com/alexandre-normand/slackscot/plugins"
+	"github.com/alexandre-normand/slackscot/store"
 	"github.com/spf13/viper"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
