@@ -1,4 +1,4 @@
-//go:generate giddyup
+//go:generate giddyup --variable=version
 package main
 
 import (
@@ -23,7 +23,7 @@ const (
 )
 
 func main() {
-	kingpin.Version(VERSION)
+	kingpin.Version(version)
 	kingpin.Parse()
 
 	v := config.NewViperWithDefaults()
@@ -96,7 +96,7 @@ func main() {
 	}
 	youppi.RegisterPlugin(&ohMonday.Plugin)
 
-	versioner := plugins.NewVersioner("youppi", VERSION)
+	versioner := plugins.NewVersioner("youppi", version)
 	youppi.RegisterPlugin(&versioner.Plugin)
 
 	err = youppi.Run()
