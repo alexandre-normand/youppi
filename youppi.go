@@ -56,14 +56,23 @@ func main() {
 	}
 
 	storagePath := v.GetString(storagePathKey)
-	strStorer, err := store.NewLevelDB(name, storagePath)
+	karmaStorer, err := store.NewLevelDB(plugins.KarmaPluginName, storagePath)
 	if err != nil {
-		log.Fatalf("Opening [%s] db failed with path [%s]", name, storagePath)
+		log.Fatalf("Opening [%s] db failed with path [%s]", plugins.KarmaPluginName, storagePath)
 	}
-	defer strStorer.Close()
+	defer karmaStorer.Close()
 
-	karma := plugins.NewKarma(strStorer)
+	karma := plugins.NewKarma(karmaStorer)
 	youppi.RegisterPlugin(&karma.Plugin)
+
+	triggererStorer, err := store.NewLevelDB("triggerer", storagePath)
+	if err != nil {
+		log.Fatalf("Opening [%s] db failed with path [%s]", "triggerer", storagePath)
+	}
+	defer triggererStorer.Close()
+
+	triggerer := plugins.NewTriggerer(triggererStorer)
+	youppi.RegisterPlugin(&triggerer.Plugin)
 
 	fingerQuoterConf, err := config.GetPluginConfig(v, plugins.FingerQuoterPluginName)
 	if err != nil {
