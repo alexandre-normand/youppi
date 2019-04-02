@@ -52,7 +52,7 @@ func main() {
 		options = append(options, slackscot.OptionLogfile(*logfile))
 	}
 
-	youppi, err := slackscot.NewSlackscot("youppi", v, options...)
+	youppi, err := slackscot.New("youppi", v, options...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,8 +109,8 @@ func main() {
 	}
 	youppi.RegisterPlugin(&ohMonday.Plugin)
 
-	versioner := plugins.NewVersioner("youppi", version)
-	youppi.RegisterPlugin(&versioner.Plugin)
+	versionner := plugins.NewVersionner("youppi", version)
+	youppi.RegisterPlugin(&versionner.Plugin)
 
 	err = youppi.Run()
 	if err != nil {
@@ -121,7 +121,7 @@ func main() {
 // newStorer returns a new StringStorer for a plugin and is responsible for deciding whether to create a leveldb
 // implementation or a inmemorydb/datastoredb one. The latter is preferred but we have the fallback if gcpProjectID
 // is not set so that local developers have an easy way to run it when developing
-func newStorer(pluginName string, storagePath string, gcpProjectID string, gcpCredentialsFile string) (storer store.StringStorer, err error) {
+func newStorer(pluginName string, storagePath string, gcpProjectID string, gcpCredentialsFile string) (storer store.GlobalSiloStringStorer, err error) {
 	if gcpProjectID != "" {
 		return newDatastoreStorerWithInMemoryCache(pluginName, gcpProjectID, gcpCredentialsFile)
 	}
@@ -132,7 +132,7 @@ func newStorer(pluginName string, storagePath string, gcpProjectID string, gcpCr
 // newDatastoreStorerWithInMemoryCache creates a new instance of a Google Cloud Datastore DB wrapped with an in-memory db that
 // acts as a write-through cache to prevent hitting the datastore. This is especially useful with plugins that use their
 // StringStorer to do their matching and answering logic that can get called quite often
-func newDatastoreStorerWithInMemoryCache(pluginName string, gcpProjectID string, gcpCredentialsFile string) (storer store.StringStorer, err error) {
+func newDatastoreStorerWithInMemoryCache(pluginName string, gcpProjectID string, gcpCredentialsFile string) (storer store.GlobalSiloStringStorer, err error) {
 	gcloudKarmaStorer, err := datastoredb.New(pluginName, gcpProjectID, option.WithCredentialsFile(gcpCredentialsFile))
 	if err != nil {
 		return nil, err
