@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/api/option"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"io"
 	"log"
 	"os"
 )
@@ -52,11 +53,6 @@ func main() {
 		options = append(options, slackscot.OptionLogfile(*logfile))
 	}
 
-	youppi, err := slackscot.New("youppi", v, options...)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	storagePath := v.GetString(storagePathKey)
 	gcpProjectID := v.GetString(gcpProjectIDConfigKey)
 
@@ -66,51 +62,27 @@ func main() {
 	}
 	defer karmaStorer.Close()
 
-	karma := plugins.NewKarma(karmaStorer)
-	youppi.RegisterPlugin(&karma.Plugin)
-
-	triggererStorer, err := newStorer("triggerer", storagePath, gcpProjectID, *gcpCredentialsFile)
+	triggererStorer, err := newStorer(plugins.TriggererPluginName, storagePath, gcpProjectID, *gcpCredentialsFile)
 	if err != nil {
-		log.Fatalf("Opening opening db for [%s]: %s", "triggerer", err.Error())
+		log.Fatalf("Opening opening db for [%s]: %s", plugins.TriggererPluginName, err.Error())
 	}
 	defer triggererStorer.Close()
 
-	triggerer := plugins.NewTriggerer(triggererStorer)
-	youppi.RegisterPlugin(&triggerer.Plugin)
+	youppi, err := slackscot.NewBot("youppi", v, options...).
+		WithPlugin(plugins.NewKarma(karmaStorer)).
+		WithPlugin(plugins.NewTriggerer(triggererStorer)).
+		WithConfigurablePluginErr(plugins.FingerQuoterPluginName, func(conf *config.PluginConfig) (p *slackscot.Plugin, err error) { return plugins.NewFingerQuoter(conf) }).
+		WithConfigurablePluginCloserErr(plugins.EmojiBannerPluginName, func(conf *config.PluginConfig) (c io.Closer, p *slackscot.Plugin, err error) {
+			return plugins.NewEmojiBannerMaker(conf)
+		}).
+		WithConfigurablePluginErr(plugins.OhMondayPluginName, func(conf *config.PluginConfig) (p *slackscot.Plugin, err error) { return plugins.NewOhMonday(conf) }).
+		WithPlugin(plugins.NewVersionner(name, version)).
+		Build()
+	defer youppi.Close()
 
-	fingerQuoterConf, err := config.GetPluginConfig(v, plugins.FingerQuoterPluginName)
 	if err != nil {
-		log.Fatalf("Error initializing finger quoter plugin: %v", err)
+		log.Fatal(err)
 	}
-	fingerQuoter, err := plugins.NewFingerQuoter(fingerQuoterConf)
-	if err != nil {
-		log.Fatalf("Error initializing finger quoter plugin: %v", err)
-	}
-	youppi.RegisterPlugin(&fingerQuoter.Plugin)
-
-	emojiBannerConf, err := config.GetPluginConfig(v, plugins.EmojiBannerPluginName)
-	if err != nil {
-		log.Fatalf("Error initializing emoji banner plugin: %v", err)
-	}
-	emojiBanner, err := plugins.NewEmojiBannerMaker(emojiBannerConf)
-	if err != nil {
-		log.Fatalf("Error initializing emoji banner plugin: %v", err)
-	}
-	defer emojiBanner.Close()
-	youppi.RegisterPlugin(&emojiBanner.Plugin)
-
-	ohMondayConf, err := config.GetPluginConfig(v, plugins.OhMondayPluginName)
-	if err != nil {
-		log.Fatalf("Error initializing oh monday plugin: %v", err)
-	}
-	ohMonday, err := plugins.NewOhMonday(ohMondayConf)
-	if err != nil {
-		log.Fatalf("Error initializing oh monday plugin: %v", err)
-	}
-	youppi.RegisterPlugin(&ohMonday.Plugin)
-
-	versionner := plugins.NewVersionner("youppi", version)
-	youppi.RegisterPlugin(&versionner.Plugin)
 
 	err = youppi.Run()
 	if err != nil {
