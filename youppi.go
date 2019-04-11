@@ -68,7 +68,7 @@ func main() {
 	}
 	defer triggererStorer.Close()
 
-	youppi, err := slackscot.NewBot("youppi", v, options...).
+	youppi, err := slackscot.NewBot(name, v, options...).
 		WithPlugin(plugins.NewKarma(karmaStorer)).
 		WithPlugin(plugins.NewTriggerer(triggererStorer)).
 		WithConfigurablePluginErr(plugins.FingerQuoterPluginName, func(conf *config.PluginConfig) (p *slackscot.Plugin, err error) { return plugins.NewFingerQuoter(conf) }).
