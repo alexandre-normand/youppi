@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/alexandre-normand/slackscot"
 	"github.com/alexandre-normand/slackscot/config"
 	"github.com/alexandre-normand/slackscot/plugins"
@@ -9,10 +10,13 @@ import (
 	"github.com/alexandre-normand/slackscot/store/datastoredb"
 	"github.com/alexandre-normand/slackscot/store/inmemorydb"
 	"github.com/spf13/viper"
+	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/sdk/metric/controller/push"
 	"google.golang.org/api/option"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -20,6 +24,7 @@ var (
 	configurationPath  = kingpin.Flag("configuration", "The path to the configuration file.").Required().String()
 	gcpCredentialsFile = kingpin.Flag("gcpCredentialsFile", "The path to the google cloud json credentials file.").String()
 	logfile            = kingpin.Flag("log", "The path to the log file").OpenFile(os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	prometheusPort     = kingpin.Flag("prometheusPort", "The port for the prometheus exporter").Default("9090").Int()
 )
 
 const (
@@ -28,9 +33,32 @@ const (
 	name                  = "youppi"
 )
 
+func startPrometheusExporter(port int) (pusher *push.Controller, err error) {
+	pusher, hf, err := prometheus.InstallNewPipeline(prometheus.Config{DefaultSummaryQuantiles: []float64{0.25, 0.5, 0.9, 0.95, 0.99}, OnError: func(err error) {
+		log.Printf("Error on prometheus exporter: %w", err)
+	}})
+
+	if err != nil {
+		return nil, err
+	}
+
+	http.HandleFunc("/metrics", hf)
+	go func() {
+		_ = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	}()
+
+	return pusher, nil
+}
+
 func main() {
 	kingpin.Version(version)
 	kingpin.Parse()
+
+	exporter, err := startPrometheusExporter(*prometheusPort)
+	if err != nil {
+		log.Fatalf("Error starting prometheus [%s]", err.Error())
+	}
+	defer exporter.Stop()
 
 	v := config.NewViperWithDefaults()
 	// Enable getting configuration from the environment, especially useful for the slack token
@@ -40,7 +68,7 @@ func main() {
 	v.BindEnv(gcpProjectIDConfigKey, "GCP_PROJECT_ID")
 
 	v.SetConfigFile(*configurationPath)
-	err := v.ReadInConfig()
+	err = v.ReadInConfig()
 	if err != nil {
 		log.Fatalf("Error loading configuration file [%s]: %v", *configurationPath, err)
 	}
@@ -88,6 +116,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//time.Sleep(time.Duration(1000) * time.Second)
 }
 
 // newStorer returns a new StringStorer for a plugin and is responsible for deciding whether to create a leveldb
