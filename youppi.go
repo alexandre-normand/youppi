@@ -75,7 +75,6 @@ func main() {
 		WithConfigurablePluginCloserErr(plugins.EmojiBannerPluginName, func(conf *config.PluginConfig) (c io.Closer, p *slackscot.Plugin, err error) {
 			return plugins.NewEmojiBannerMaker(conf)
 		}).
-		WithConfigurablePluginErr(plugins.OhMondayPluginName, func(conf *config.PluginConfig) (p *slackscot.Plugin, err error) { return plugins.NewOhMonday(conf) }).
 		WithPlugin(plugins.NewVersionner(name, version)).
 		Build()
 	defer youppi.Close()
