@@ -1,12 +1,12 @@
 youppi
 ------
 
-[![Build Status](https://travis-ci.org/alexandre-normand/youppi.svg)](https://travis-ci.org/alexandre-normand/youppi) 
+[![Build Status](https://github.com/alexandre-normand/youppi/workflows/Go/badge.svg)](https://github.com/alexandre-normand/youppi/actions) 
 [![Go Report Card](https://goreportcard.com/badge/github.com/alexandre-normand/youppi)](https://goreportcard.com/report/github.com/alexandre-normand/youppi)
 
 slack bot, written in `Go` based on [slackscot](https://github.com/alexandre-normand/slackscot).
 
-![youppi](https://www.dropbox.com/s/bp202gxqq9hkeg1/youppi_ejected.gif?raw=1)
+![youppi](https://camo.githubusercontent.com/81daeca39e832da5b446c2f47a7da6b4b0c9118c/68747470733a2f2f7777772e64726f70626f782e636f6d2f732f62703230326778717139686b6567312f796f757070695f656a65637465642e6769663f7261773d31)
 
 To learn more about the real life youppi!, check out this 
 [99% invisible episode](http://99percentinvisible.org/episode/la-mascotte/) and
